@@ -1,25 +1,73 @@
-﻿using System.Text;
-using DesafioProjetoHospedagem.Models;
+﻿namespace DesafioProjetoHospedagem.Models
+{
+    public class Pessoa
+    {
+        public string Nome { get; set; }
 
-Console.OutputEncoding = Encoding.UTF8;
+        public Pessoa(string nome)
+        {
+            Nome = nome;
+        }
+    }
 
-// Cria os modelos de hóspedes e cadastra na lista de hóspedes
-List<Pessoa> hospedes = new List<Pessoa>();
+    public class Suite
+    {
+        public string TipoSuite { get; set; }
+        public int Capacidade { get; set; }
+        public decimal ValorDiaria { get; set; }
 
-Pessoa p1 = new Pessoa(nome: "Hóspede 1");
-Pessoa p2 = new Pessoa(nome: "Hóspede 2");
+        public Suite(string tipoSuite, int capacidade, decimal valorDiaria)
+        {
+            TipoSuite = tipoSuite;
+            Capacidade = capacidade;
+            ValorDiaria = valorDiaria;
+        }
+    }
 
-hospedes.Add(p1);
-hospedes.Add(p2);
+    public class Reserva
+    {
+        public List<Pessoa> Hospedes { get; set; } = new List<Pessoa>();
+        public Suite Suite { get; set; }
+        public int DiasReservados { get; set; }
 
-// Cria a suíte
-Suite suite = new Suite(tipoSuite: "Premium", capacidade: 2, valorDiaria: 30);
+        public Reserva(int diasReservados)
+        {
+            DiasReservados = diasReservados;
+        }
 
-// Cria uma nova reserva, passando a suíte e os hóspedes
-Reserva reserva = new Reserva(diasReservados: 5);
-reserva.CadastrarSuite(suite);
-reserva.CadastrarHospedes(hospedes);
+        public void CadastrarHospedes(List<Pessoa> hospedes)
+        {
+            if (hospedes.Count <= Suite.Capacidade)
+            {
+                Hospedes = hospedes;
+            }
+            else
+            {
+                throw new Exception("A quantidade de hóspedes excede a capacidade da suíte.");
+            }
+        }
 
-// Exibe a quantidade de hóspedes e o valor da diária
-Console.WriteLine($"Hóspedes: {reserva.ObterQuantidadeHospedes()}");
-Console.WriteLine($"Valor diária: {reserva.CalcularValorDiaria()}");
+        public void CadastrarSuite(Suite suite)
+        {
+            Suite = suite;
+        }
+
+        public int ObterQuantidadeHospedes()
+        {
+            return Hospedes.Count;
+        }
+
+        public decimal CalcularValorDiaria()
+        {
+            decimal valorTotal = DiasReservados * Suite.ValorDiaria;
+
+            // Aplicar desconto de 10% para reservas acima de 10 dias
+            if (DiasReservados >= 10)
+            {
+                valorTotal *= 0.90m;
+            }
+
+            return valorTotal;
+        }
+    }
+}
